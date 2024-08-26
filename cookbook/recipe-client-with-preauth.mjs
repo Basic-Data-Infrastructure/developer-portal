@@ -44,14 +44,6 @@ function createClientAssertion(token) {
   })
 };
 
-// Call /token endpoint and return access_token
-async function accessToken(eori, tokenUrl) {
-  let payload = { "iss": YOUR_EORI, "sub": YOUR_EORI, "aud": eori, "jti": uuidv4() }
-  const token = jwt.sign(payload, pemData, { algorithm: 'RS256', expiresIn: "30s", header: header });
-  response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
-  return response.data['access_token'];
-}
-
 // sign JWT payload with default settings
 function signJwt(payload) {
   const header = {
@@ -60,6 +52,14 @@ function signJwt(payload) {
     x5c: x5c
   };
   return jwt.sign(payload, pemData, { algorithm: 'RS256', expiresIn: "30s", header: header });
+}
+
+// Call /token endpoint and return access_token
+async function accessToken(eori, tokenUrl) {
+  let payload = { "iss": YOUR_EORI, "sub": YOUR_EORI, "aud": eori, "jti": uuidv4() }
+  const token = signJwt(payload);
+  response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
+  return response.data['access_token'];
 }
 
 // decode JWT without signature verification

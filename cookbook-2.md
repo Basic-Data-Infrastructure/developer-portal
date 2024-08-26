@@ -10,100 +10,168 @@ As Data Consumer, call the API of a Service Provider while being pre-authorized 
 
 ### Get token
 
-In order to perform a /parties call in the testing environment at dilsat1-mw.pg.bdinetwork.org, first one needs to post a client assertion to the /connect/token endpoint. To create a client assertion, we use the [`python-ishare`](https://github.com/iSHAREScheme/python-ishare) library. Install it with `pip install python-ishare`
+In order to perform a /parties call in the test environment, first one needs to post a client assertion to the /connect/token endpoint. We will use node.js for these examples. To create a client assertion, we use the `jsonwebtoken` library, together with several other common libraries: `fs`, `uuid`, `crypto` and `axios`.
 
 You will need a private key, a certificate, and an EORI client id.
 
 Then run the following script, taking care to set the correct values for your client id and the locations of the private key and the certificate.
 
 ```
-from pathlib import Path
+// imports
+import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
+import axios from 'axios';
 
-from cryptography.x509 import load_pem_x509_certificates, Certificate
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
-from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+// file paths
 
-from python_ishare import create_jwt
+const privateKeyPath = process.env.HOME + '/.ssh/EU.EORI.NLFLEXTRANS.pem';
+const certKeyPath = process.env.HOME + '/.ssh/EU.EORI.NLFLEXTRANS.crt';
 
-YOUR_EORI = ... # TODO
-THEIR_EORI = "EU.EORI.NLDILSATTEST1"
+// credentials
 
-pk_path = Path(r"my_private_key.pem") # TODO
-# Load your RSA key to an RSAPrivateKey
-with pk_path.open("rb") as file:
-    private_key: RSAPrivateKey = load_pem_private_key(file.read(), password=None)
+const YOUR_EORI = "EU.EORI.NLFLEXTRANS";
+const ASSOC_EORI = "EU.EORI.NLDILSATTEST1";
+const SP_EORI = "EU.EORI.NL809023854";
+const AR_EORI = 'EU.EORI.NL000000004';
+const pemData = fs.readFileSync(privateKeyPath, 'utf8');
+const publicKey = crypto.createPublicKey(pemData);
+const certificateChainData = fs.readFileSync(certKeyPath, 'utf8');
+// Split the certificate chain into individual certificates
+const certificates = certificateChainData.match(/-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g);
+// Convert each certificate to DER format and then base64 encode it
+const x5c = certificates.map(cert => {
+  const der = Buffer.from(cert.replace(/-----\w+ CERTIFICATE-----/g, ''), 'base64');
+  return der.toString('base64');
+});
 
-cert_path = Path(r"my_certificate.crt") # TODO
-with cert_path.open("rb") as file:
-    chain: list[Certificate] = load_pem_x509_certificates(file.read())
+// URLs
+const tokenUrlAssoc = "https://dilsat1-mw.pg.bdinetwork.org/connect/token";
+const tokenArUrl = "https://ar.isharetest.net/connect/token";
+const delegationArUrl = "https://ar.isharetest.net/delegation";
+const partiesUrlAssoc = "https://dilsat1-mw.pg.bdinetwork.org/parties";
 
-# Create the actual token
-client_assertion = create_jwt(
-    payload={ "iss": YOUR_EORI, "sub": YOUR_EORI, "aud": THEIR_EORI },
-    private_key=private_key,
-    x5c_certificate_chain=chain
-)
-
-print(client_assertion)
-```
-
-The next step is to call the `/connect/token` endpoint, and post the client assertion.
-
-```
-import requests
-
-url = "https://dilsat1-mw.pg.bdinetwork.org/connect/token"
-headers = {
-    "accept": "application/json",
-    "Content-Type": "application/x-www-form-urlencoded"
-}
-data = {
+// create client assertion with default values
+function createClientAssertion(token) {
+  return new URLSearchParams({
     "grant_type": "client_credentials",
     "scope": "iSHARE",
-    "client_id": "EU.EORI.NLFLEXTRANS",
+    "client_id": YOUR_EORI,
     "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-    "client_assertion": client_assertion
+    "client_assertion": token
+  })
+};
+
+// sign JWT payload with default settings
+function signJwt(payload) {
+  const header = {
+    alg: 'RS256',
+    typ: 'JWT',
+    x5c: x5c
+  };
+  return jwt.sign(payload, pemData, { algorithm: 'RS256', expiresIn: "30s", header: header });
 }
 
-response = requests.post(url, headers=headers, data=data)
-
-print(response.status_code)
-print(response.json())
-
-access_token = response.json()['access_token']
-```
-
-### Make /parties call
-
-Now we are ready to make a call to the `/parties` endpoint.
-
-```
-import requests
-
-url = "https://dilsat1-mw.pg.bdinetwork.org/parties"
-params = {
-    "active_only": "true",
-    "name": "*Corporation",
-    "certified_only": "false",
-    "adherenceStatus": "Active",
-    "publiclyPublishable": "true",
-    "framework": "iSHARE",
-    "compliancyVerified": "true",
-    "legalAdherence": "true",
-    "page": "1"
-}
-headers = {
-    "accept": "application/json",
-    "Authorization": "Bearer " + access_token
+// Call /token endpoint and return access_token
+async function accessToken(eori, tokenUrl) {
+  let payload = { "iss": YOUR_EORI, "sub": YOUR_EORI, "aud": eori, "jti": uuidv4() }
+  const token = signJwt(payload);
+  response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
+  return response.data['access_token'];
 }
 
-response = requests.get(url, headers=headers, params=params)
+// decode JWT without signature verification
+function decodeJWT(token) {
+  // Split the JWT into its three parts: header, payload, and signature
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+      throw new Error('Invalid JWT');
+  }
 
-print(response.status_code)
-print(response.json())
+  // Decode the Base64Url encoded payload (second part)
+  const base64Url = parts[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const payload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+
+  // Parse the JSON payload
+  return JSON.parse(payload);
+}
+
+function checkAdherence(adh) {
+  if (adh['status'] !== 'Active') {
+    throw new Error("Status is not Active");
+  }
+  let now = new Date();
+  if (new Date(adh['start_date']) > now) {
+    throw new Error("Start date is set in future");
+  }
+  if (new Date(adh['end_date']) < now) {
+    throw new Error("End date is set in past");
+  }
+}
+
+let bearerToken = accessToken(THEIR_EORI, tokenUrlAssoc);
+
+const headersParties = {
+  "accept": "application/json",
+  "Authorization": "Bearer " + bearerToken
+};
+
+const params = {
+  "active_only": "true",
+  "certified_only": "false",
+  "adherenceStatus": "Active",
+  "framework": "iSHARE",
+  "publiclyPublishable": "false",
+  "page": "1"
+};
+
+// association registry /parties
+response = await axios.get(partiesUrlAssoc + '/' + SP_EORI, { headers: headersParties, params: params })
+let partyToken = response.data['party_token'];
+
+const decodedPayload = decodeJWT(partyToken);
+console.log(decodedPayload);
+let party = decodedPayload["party_info"];
+console.log(party);
+checkAdherence(party);
+let ar = party["authregistery"][0];
+console.log(ar);
+
+bearerToken = accessToken(AR_EORI, tokenArUrl);
+
+const arHeaders = { "Content-Type": "application/json",
+                    "Authorization": "Bearer " + bearerToken }
+const policy = {
+  "target": {
+    "resource": {
+      "type": "text",
+      "identifiers": [ "text" ],
+      "attributes": [ "text" ]
+    },
+    "actions": [ "text" ]
+  },
+  "rules": [ { "effect": "text" } ]
+};
+let body = JSON.stringify({"delegationRequest": {
+    "policyIssuer": "text",
+    "target": { "accessSubject": "text" },
+    "policySets": [ { "policies": [ policy ] } ]
+  }})
+// authorization registry /delegation
+response = await axios.post(delegationArUrl, body, { arHeaders });
+let delegationToken = response.data.delegationToken;
+
+bearerToken = accessToken(SP_EORI, tokenSpUrl);
+const headersApi = {
+  "accept": "application/json",
+  "Authorization": "Bearer " + bearerToken,
+  "DelegationEvidence": delegationToken
+};
+
+// Make actual API call with delegation evidence token
+response = await axios.post(spApiUrl, body, headersApi);
 ```
-
-### TODO Fetch token from AR
-### TODO Fetch delegation evidence from AR
-### TODO Fetch token from provider
-### TODO Call API with token and delegation evidence
