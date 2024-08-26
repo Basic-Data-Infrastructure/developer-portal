@@ -1,0 +1,24 @@
+@startuml
+
+participant "Consumer" as consumer
+participant "Association Register" as association
+participant "Authorization Register (owner)" as ownerAr
+participant "Resource (owner)" as ownerApi
+
+consumer -> ownerApi : /token (get authentication token)
+ownerApi -> ownerApi : check client assertion
+ownerApi -> association : /token (get authentication token)
+association -> association : check client assertion
+association -> association : check owner still compliant
+association -> ownerApi : OK: token
+ownerApi -> association : /party (with token get consumer party information)
+association -> association : check token
+association -> ownerApi : OK: party info
+ownerApi -> ownerApi : check consumer party info for compliance
+ownerApi -> consumer : OK: token
+
+consumer -> ownerApi : /some-resource (with token)
+ownerApi -> ownerApi : check token
+ownerApi -> consumer : OK: data
+
+@enduml

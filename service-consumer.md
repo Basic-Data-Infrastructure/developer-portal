@@ -75,6 +75,10 @@ To get the ID and the URL of the Authorization Registry, the Service Consumer sh
 
 To get the Bearer Token, the consumer must perform a token call on the Association Registry, passing a client assertion to them, containing the IDs of the consumer and the Association Registry.
 
-#### Sequence Diagram
+#### Sequence Diagram Without Authorization
+
+![Sequence diagram](simple-base-sequence.svg)
+
+#### Sequence Diagram With Pre-Authorization
 
 ![Sequence diagram](base-sequence.svg)
