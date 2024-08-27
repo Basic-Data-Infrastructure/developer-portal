@@ -23,8 +23,7 @@ const certificateChainData = fs.readFileSync(certKeyPath, 'utf8');
 const certificates = certificateChainData.match(/-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g);
 // Convert each certificate to DER format and then base64 encode it
 const x5c = certificates.map(cert => {
-  const der = Buffer.from(cert.replace(/-----\w+ CERTIFICATE-----/g, ''), 'base64');
-  return der.toString('base64');
+  return cert.replace(/-----\w+ CERTIFICATE-----/g, '').replace(/\s+/g, '');
 });
 
 // URLs
