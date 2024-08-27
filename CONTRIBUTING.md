@@ -17,7 +17,7 @@ If you’ve encountered an error in the documentation, found a bug, have a sugge
 	•	Suggest Features: If you have a feature in mind that would enhance the portal, submit it as a feature request. We welcome ideas that could improve the user experience or add value to the portal.
 	•	Enhancement Ideas: If you think there’s an area of the project that could be improved (performance, documentation, user interface, etc.), please let us know.
 
-👉 Submit an Issue or Feature Request on GitHub
+[👉 Submit an Issue or Feature Request on GitHub](https://github.com/Basic-Data-Infrastructure/developer-portal/issues)
 
 ### 2. Contribute Code via Pull Requests
 
