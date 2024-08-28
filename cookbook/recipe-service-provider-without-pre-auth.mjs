@@ -89,7 +89,35 @@ function checkAdherence(adh) {
   }
 }
 
-function validateCertificateChain(certificates) {
+// Return hex (upcase) fingerprint for certificate
+function fingerprint(base64Cert) {
+  // Step 1: Decode base64
+  const derBuffer = Buffer.from(base64Cert, 'base64');
+
+  // Step 2: Compute the SHA-256 hash of the DER-encoded certificate, and convert the hash to uppercase
+  return crypto.createHash('sha256').update(derBuffer).digest('hex').toUpperCase();
+}
+
+function checkTrust(trustedList, certificate) {
+  let certFingerprint = fingerprint(certificate);
+  for(let i=0; i < trustedList.length; i++) {
+    let c = trustedList[i];
+    if(c.certificate_fingerprint == certFingerprint) {
+      console.log(c);
+      return true;
+    }
+  }
+  return false;
+}
+
+function validateCertificateChain(trustedList, x5c) {
+  // validate the certificate chain (is it a chain? is the CA in our list of accepted associations?)
+  const certificates = x5c.map(certBase64 => {
+    const certDer = forge.util.decode64(certBase64);
+    const asn1Obj = forge.asn1.fromDer(certDer);
+    return forge.pki.certificateFromAsn1(asn1Obj);
+  });
+
   try {
     for (let i = 0; i < certificates.length - 1; i++) {
       const subjectCert = certificates[i];
@@ -113,29 +141,12 @@ function validateCertificateChain(certificates) {
       return false;
     }
 
-    let serialNumber = rootCert.serialNumber;
-    let trustedCertificatesSN = ["04b536719019a8b1"];
-    for(i=0; i<trustedCertificatesSN.length; i++) {
-      if(serialNumber === trustedCertificatesSN[i]) {
-        return true;
-      }
-    }
-    return false;
+    let rootCertX5c = x5c[x5c.length-1];
+    return checkTrust(trustedList, rootCertX5c);
   } catch (err) {
     console.error('Error during certificate chain validation:', err.message);
     return false;
   }
-}
-
-try {
-  const isValid = validateCertificateChain(certificates);
-  if (isValid) {
-    console.log('Certificate chain is valid.');
-  } else {
-    console.error('Certificate chain validation failed.');
-  }
-} catch (err) {
-  console.error('Error during validation:', err.message);
 }
 
 // After a user has made a http request for the token, extract the client assertion and call this function.
@@ -169,35 +180,29 @@ async function token(clientAssertionJWT) {
   jwt.verify(token, x5cToPem(x5c[0]));
 
   // validate the certificate chain (is it a chain? is the CA in our list of accepted associations?)
-  const certs = x5c.map(certBase64 => {
-    const certDer = forge.util.decode64(certBase64);
-    const asn1Obj = forge.asn1.fromDer(certDer);
-    return forge.pki.certificateFromAsn1(asn1Obj);
-  });
+  let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
+  const authenticatedHeader = {
+    "accept": "application/json",
+    "Authorization": "Bearer " + bearerToken
+  };
 
-  if (!validateCertificateChain(certs)) {
+  let response = await axios.get(trustedUrlAssoc, { headers: authenticatedHeader, params: {} });
+  const trustedList = decodeJWT(response.data.trusted_list_token).trusted_list;
+
+  if (!validateCertificateChain(trustedList, x5c)) {
     throw new Error("Certificate chain invalid");
   }
 
   // contact the association register to see if the client is still in good standing
 
   // first, get a token
-  let bearerToken = accessToken(ASSOC_EORI, tokenUrlAssoc);
+  bearerToken = accessToken(ASSOC_EORI, tokenUrlAssoc);
 
   // then, make the parties call
 
   const headersParties = { "accept": "application/json", "Authorization": "Bearer " + bearerToken };
-  // TODO just get the party for the client id
-  const params = {
-    "active_only": "true",
-    "certified_only": "false",
-    "adherenceStatus": "Active",
-    "framework": "iSHARE",
-    "publiclyPublishable": "false",
-    "page": "1"
-  };
 
-  let partiesResponse = await axios.get(partiesUrlAssoc + '/' + clientId, { headers: headersParties, params: params });
+  let partiesResponse = await axios.get(partiesUrlAssoc + '/' + clientId, { headers: headersParties, params: {} });
   let partyToken = partiesResponse.data['party_token'];
   const decodedPayload = decodeJWT(partyToken);
   let party = decodedPayload["payload"]["party_info"];

@@ -93,24 +93,15 @@ function checkAdherence(adh) {
   }
 }
 
-let bearerToken = accessToken(THEIR_EORI, tokenUrlAssoc);
+let bearerToken = accessToken(ASSOC_EORI, tokenUrlAssoc);
 
 const headersParties = {
   "accept": "application/json",
   "Authorization": "Bearer " + bearerToken
 };
 
-const params = {
-  "active_only": "true",
-  "certified_only": "false",
-  "adherenceStatus": "Active",
-  "framework": "iSHARE",
-  "publiclyPublishable": "false",
-  "page": "1"
-};
-
 // association registry /parties
-response = await axios.get(partiesUrlAssoc + '/' + SP_EORI, { headers: headersParties, params: params })
+response = await axios.get(partiesUrlAssoc + '/' + SP_EORI, { headers: headersParties, params: {} })
 let partyToken = response.data['party_token'];
 
 const decodedPayload = decodeJWT(partyToken);
@@ -119,6 +110,7 @@ let party = decodedPayload["party_info"];
 console.log(party);
 checkAdherence(party);
 let ar = party["authregistery"][0];
+
 console.log(ar);
 
 bearerToken = accessToken(AR_EORI, tokenArUrl);
