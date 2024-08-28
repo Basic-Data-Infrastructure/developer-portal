@@ -4,10 +4,7 @@ category: 4. Components
 order: 3
 ---
 
-### About the Authorization Register
-
-
-The Authorization Register in a Data Space, such as the iSHARE Data Space, is a critical component that manages and enforces access control policies. Its core functions revolve around ensuring that data access is granted based on predefined rules and that only authorized participants can access specific data or services. Here are the core functions of the Authorization Register:
+The Authorization Register in a Data Space, is a component that manages and enforces access control policies. Its core functions revolve around ensuring that data access is granted based on predefined rules and that only authorized participants can access specific data or services. Here are the core functions of the Authorization Register:
 
 #### Core Functions of the Authorization Register
 
