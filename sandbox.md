@@ -13,4 +13,4 @@ There are three existing sandbox environments. In order to get access to them, p
 | ---- | --- | ------- | ------- |
 | iSHARE Test Authorisation Registry | [isharetest](https://ar.isharetest.net/) | [Swagger](https://ar.isharetest.net/swagger/index.html) | EU.EORI.NL000000004 |
 | BDI Association Registry | [iSHARE](https://dilsat1.pg.bdinetwork.org/) | - | EU.EORI.NLDILSATTEST1 |
-| Poort8 Authorisation Registry | [Poort80](https://tsl-ishare-dataspace-coremanager-preview.azurewebsites.net/api/ishare) | - | EU.EORI.NLP8TSLAR1 |
+| Poort8 Authorisation Registry | [Poort8](https://tsl-ishare-dataspace-coremanager-preview.azurewebsites.net/api/ishare) | - | EU.EORI.NLP8TSLAR1 |
