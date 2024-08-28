@@ -79,6 +79,10 @@ To get the Bearer Token, the consumer must perform a token call on the Associati
 
 ![Sequence diagram](simple-base-sequence.svg)
 
+#### Sequence Diagram Without Pre-Authorization
+
+![Sequence diagram](delegation-by-owner-sequence.svg)
+
 #### Sequence Diagram With Pre-Authorization
 
 ![Sequence diagram](base-sequence.svg)

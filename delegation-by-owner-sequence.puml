@@ -1,0 +1,51 @@
+@startuml
+
+participant "Consumer" as consumer
+participant "Association Register" as association
+participant "Authorization Register (owner)" as ownerAr
+participant "Resource (owner)" as ownerApi
+
+consumer -> ownerApi : /token (get authentication token)
+ownerApi -> ownerApi : check client assertion
+ownerApi -> association : /token (get authentication token)
+association -> association : check client assertion
+association -> association : check owner still compliant
+association -> ownerApi : OK: token
+ownerApi -> association : /party (with token get consumer party information)
+association -> association : check token
+association -> ownerApi : OK: party info
+ownerApi -> ownerApi : check consumer party info for compliance
+ownerApi -> consumer : OK: token
+
+consumer -> ownerApi : /some-resource (with token, but without delegation evidence)
+ownerApi -> ownerApi : check token
+
+ownerApi -> association : /token (get authentication token)
+association -> association : check client assertion
+association -> association : check ownerApi still compliant
+association -> ownerApi  : OK: token
+ownerApi -> association : /party (with token get ownerAr party information)
+association -> association : check token
+association -> ownerApi  : OK: party info
+ownerApi -> ownerApi : extract Authorization Register URL
+
+ownerApi -> ownerAr : /token (get authentication token)
+ownerAr -> ownerAr : check client assertion
+ownerAr -> association : /token (get authentication token)
+association -> association : check client assertion
+association -> association : check AR still compliant
+association -> ownerAr  : OK: token
+ownerAr ->  association : /party (with token get ownerApi party information)
+association -> association : check token
+association -> ownerAr   : OK: party info
+ownerAr -> ownerAr : check ownerApi party info for compliance
+ownerAr -> ownerApi  : OK: token
+ownerApi -> ownerAr : /delegation (with token and delegation mask)
+ownerAr -> ownerAr : check token
+ownerAr -> ownerAr : check delegation mask policies
+ownerAr -> ownerApi  : OK: delegation evidence
+
+ownerApi -> ownerApi : check delegation evidence
+ownerApi -> consumer : OK: data
+
+@enduml
