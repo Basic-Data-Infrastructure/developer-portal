@@ -1,7 +1,7 @@
 ---
-title: Events
-category: 3. What Is BDI
-order: 3
+# title: Events
+# category: 3. What Is BDI
+# order: 3
 ---
 
 TODO Very little concrete information so summarizing what's on the BDI page

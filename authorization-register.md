@@ -1,15 +1,12 @@
 ---
-title: Authorization Registry
+title: Authorization Register
 category: 4. Components
 order: 3
 ---
 
-### About the Authorization Registry
+Within a Data Space, The Authorization Register manages and enforces access control policies. Its core functions revolve around ensuring that data access is granted based on predefined rules and that only authorized participants can access specific data or services. Here are the core functions of the Authorization Register:
 
-
-The Authorization Registry in a Data Space, such as the iSHARE Data Space, is a critical component that manages and enforces access control policies. Its core functions revolve around ensuring that data access is granted based on predefined rules and that only authorized participants can access specific data or services. Here are the core functions of the Authorization Registry:
-
-#### Core Functions of the Authorization Registry
+#### Core Functions of the Authorization Register
 
 
 ##### Access Control Policy Management:
@@ -54,7 +51,7 @@ Dynamic Roles: Allows for dynamic assignment of roles based on context and chang
 
 #### Main API Call
 
-The main API-call of the Authorization Registry is the `/delegation` call. It is used to pass a delegation mask, or delegation request, to the AR, and to receive a Delegation Evidence, a JWT, in response. A Delegation Mask contains an issuer and a target, and a set of policies. Each policy contains (desired) rules (e.g. "Effect: permit"), and a target. The target contains a resource, an environment, and a list of actions (e.g. create, read, update, delete). Together, the policies represent the right to take specified actions on a specified set of resources.
+The main API-call of the Authorization Register is the `/delegation` call. It is used to pass a delegation mask, or delegation request, to the AR, and to receive a Delegation Evidence, a JWT, in response. A Delegation Mask contains an issuer and a target, and a set of policies. Each policy contains (desired) rules (e.g. "Effect: permit"), and a target. The target contains a resource, an environment, and a list of actions (e.g. create, read, update, delete). Together, the policies represent the right to take specified actions on a specified set of resources.
 
 The Delegation Evidence is practically identical to the Delegation Mask. It also contains an issuer, a target, and a set of policies, and in addition it contains a time frame in which the Delegation Evidence is valid, and a few other values, such as the license for the target, and a maximum delegation depth.
 

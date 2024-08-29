@@ -4,7 +4,7 @@ category: 6. Writing a client
 order: 2
 ---
 
-TODO: Make this more low level and concrete
+TODO: Include references to two ways of service discovery: 1. via Association Register party info, 2. via DNS (pdf document)
 
 Service discovery in the context of Basic Data Infrastructure (BDI) is a crucial mechanism that helps participants locate and access various services within a vast and interconnected digital network. Imagine it as an advanced directory system that knows where all the services, such as data storage, analytics tools, and application interfaces, are located. This directory system ensures that participants can easily find and use these services without needing to know their specific locations or endpoints in advance.
 
