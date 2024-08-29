@@ -177,11 +177,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size:48px
+    font-size:40px
 }
 
 h2 {
-    font-size:38px
+    font-size:36px
 }
 
 h3 {
@@ -1440,9 +1440,9 @@ html.dark .row.flex-content.row3 {
 }
 
 .row.flex-content.row3 .full-row .blocks-container .blocks-group.left-group {
-    width: 20%;
+    width: 22%;
     position: relative;
-    padding-right: 50px;
+    padding-right: 40px;
     box-sizing:border-box
 }
 
@@ -1555,7 +1555,7 @@ html.dark .row.flex-content.row3 {
 }
 
 .row.flex-content.row3 .full-row .blocks-container .blocks-group.right-group {
-    width: calc(80% - 50px);
+    width: calc(78% - 50px);
     margin-left: 50px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     background-color: #fff;
