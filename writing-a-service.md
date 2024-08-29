@@ -12,6 +12,8 @@ When designing a new API in the Logistics sector, we recommend using existing st
 
 [EPCIS](https://www.gs1.org/standards/epcis) is a data sharing standard for enabling visibility, within organisations as well as across an entire supply chain of trading partners and other stakeholders. It helps provide the “what, when, where, why and how” of products and other assets, enabling the capture and sharing of interoperable information about status, location, movement and chain of custody.
 
+More information can be found in the [Developing Semantics for Supply Chain, Transport and Logistics](https://bdinetwork.org/wp-content/uploads/2024/01/2024-BDI-Developing-Semantics-for-Supply-Chain-Transport-Logistics.pdf) white paper.
+
 ## BDI Enabling
 
 To extend a service provider API and make it BDI compatible, at minimum you will need to provide the `/connect/token` endpoint to provide access tokens for use in further API calls. The `/connect/token` endpoint which will first check whether the client assertion in the request is valid and addressed to the server. You will perform get a token from the Association Registry, and then use it to perform a /party call there to lookup information on the client based on the client id included in the client assertion. If the party information shows that the client is compliant, then you can return a token to the client.
