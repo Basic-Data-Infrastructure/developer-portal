@@ -4,12 +4,10 @@ category: 3. What Is BDI
 order: 1
 ---
 
-Basic Data Infrastructure (BDI) helps people in the logistics business share information more easily and efficiently. Think of it like a super-organized library where everyone can quickly find and share the exact information they need without any confusion or delays. BDI sets up clear rules and systems to make sure everyone knows how to share data securely and correctly. It uses smart tools to automatically process information and send alerts when something important happens. By building trust and ensuring security with the help of the iSHARE Trust Framework, BDI makes sure that all the information shared is reliable and safe, helping all parties work together smoothly.
+The Basic Data Infrastructure (BDI) is a decentralized system designed to help different organizations, especially in the logistics branch, share data safely and efficiently. Think of BDI as a giant, organized library where various entities, such as businesses and government agencies, can securely store their data and access data from others. This “library” operates under strict rules to ensure that only the right people have access to the right data, maintaining high levels of security and privacy.
 
-Building trust and ensuring security is comprised of the following aspects:
+A key feature of BDI is its decentralized nature. Instead of a single central authority controlling everything, BDI consists of many interconnected services that work together. These services share information and coordinate efforts to ensure the system runs smoothly. These services are run by multiple organizations, making BDI a federated system. This decentralized setup makes BDI more flexible and resilient, allowing it to easily adapt to new participants and evolving needs while consistently upholding rigorous security and trust standards.
 
-1. Digital Trust: Ensuring that the data shared is authentic and comes from verified sources.
-1. Identity and Access Control: Making sure that only authorized individuals or organizations can access certain information.
-1. Secure Data Exchange: Protecting the data during transfer so it cannot be tampered with or intercepted by unauthorized parties.
-1. Transparency: Providing clear and open processes so that everyone involved knows how data is handled and can verify its accuracy.
-1. Accountability: Keeping track of who accesses and shares data, so there is a record of all transactions, ensuring responsibility and traceability.
+Within this system, each participant is assigned a unique identity, similar to a library card, which is used to verify their identity. When an organization wants to access or share data, they use this identity for authentication and authorization. BDI employs digital keys and signatures to verify these identities, ensuring that only authorized participants can view or use the data. This process is overseen by a set of registers that track who each participant is and what permissions they have, similar to how a librarian checks if you have the right library card to borrow a book, and whether you have been paying your dues.
+
+In summary, BDI enables secure and efficient data sharing across organizations, supported by a decentralized structure that fosters flexibility, resilience, and trust.
