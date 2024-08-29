@@ -4,9 +4,13 @@ category: 7. Writing a service
 order: 1
 ---
 
-## Designing the API
+## Designing the API -- existing standards
 
-When designing a new API in the Logistics sector, we recommend using existing standards for entities from the world of logistics, such as vehicle, route, location, trip and transport order. [Open Trip Model](https://www.sutc.nl/en_US/open-trip-model) has standardized these entities and [documented](https://otm5.opentripmodel.org) them, so that anyone may use them and data exchange will become much more simple.
+When designing a new API in the Logistics sector, we recommend using existing standards for entities from the world of logistics, such as vehicle, route, location, trip and transport order.
+
+[Open Trip Model](https://www.sutc.nl/en_US/open-trip-model) has standardized logistics entities and [documented](https://otm5.opentripmodel.org) them, so that anyone may use them and data exchange will become much more simple.
+
+[EPCIS](https://www.gs1.org/standards/epcis) is a data sharing standard for enabling visibility, within organisations as well as across an entire supply chain of trading partners and other stakeholders. It helps provide the “what, when, where, why and how” of products and other assets, enabling the capture and sharing of interoperable information about status, location, movement and chain of custody.
 
 ## BDI Enabling
 
