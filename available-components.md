@@ -18,7 +18,7 @@ _This implementation of the iSHARE Satellite is only meant for testing and demon
 
 ### [Poort8 Dataspace Noodle Bar](https://github.com/POORT8/Poort8.Dataspace.NoodleBar)
 
-The Noodle Bar project is under the Basic Data Infrastructure umbrella, pending its ongoing development.
+The Noodle Bar project falls under the Basic Data Infrastructure umbrella, pending its ongoing development.
 
 Noodle Bar facilitates setting up dataspaces that follow certain principles, serving as an initial platform for data providers, apps, and data consumers.
 
