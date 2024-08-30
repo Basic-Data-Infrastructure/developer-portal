@@ -1,18 +1,18 @@
 ---
-title: Service Consumer
+title: Data Consumer
 category: 4. Components
 order: 5
 ---
 
-A Service Consumer wishes to access a service of a certain Service Provider. There are two ways in which Service Providers can be implemented: the minimal implementation and the full implementation.
+A Data Consumer wishes to access a service of a certain Service Provider. There are two ways in which Service Providers can be implemented: the minimal implementation and the full implementation.
 
 ### Minimal Implementation
 
-The minimal implementation is simple to implement for the Service Consumer, but hard for the Service Provider. The responsibility to call the Authorization Registry falls on the Service Provider, instead of the consumer.
+The minimal implementation is simple to implement for the Data Consumer, but hard for the Service Provider. The responsibility to call the Authorization Registry falls on the Service Provider, instead of the consumer.
 
 ##### Gather Required Data
 
-Before starting, the Service Consumer will need the following data:
+Before starting, the Data Consumer will need the following data:
 
 - Their own ID
 - A key pair
@@ -23,17 +23,17 @@ Before starting, the Service Consumer will need the following data:
 
 ##### Perform Resource Request
 
-In order to access a resource at a Service Provider, the Service Consumer should be familiar with the particular API of the Service Provider, since there is no standard for Service Provider APIs. So the consumer should be able to compose an HTTP request that conforms to the API.
+In order to access a resource at a Service Provider, the Data Consumer should be familiar with the particular API of the Service Provider, since there is no standard for Service Provider APIs. So the consumer should be able to compose an HTTP request that conforms to the API.
 
 When the consumer has created the HTTP Request, they should add a Bearer Token to the request header. This token proves that the client is who he says he is, and that he is a valid iSHARE participant. To get the Bearer Token, you must perform a token call on the Service Provider, passing a [Client Assertion](glossary.md#client-assertion) to them, which is a statement about your identity signed with your private key, and the resource you wish to access, specified by the ID of the Service Provider.
 
 ### Full Implementation
 
-The full implementation is hard for the Service Consumer, but easy for the Service Provider. The responsibility to call the Authorization Registry falls on the Service Consumer, instead of the provider. Here follow the steps necessary for a Service Consumer in order to access a resource at a Service Provider, using the full implementation.
+The full implementation is hard for the Data Consumer, but easy for the Service Provider. The responsibility to call the Authorization Registry falls on the Data Consumer, instead of the provider. Here follow the steps necessary for a Data Consumer in order to access a resource at a Service Provider, using the full implementation.
 
 ##### Gather Required Data
 
-Before starting, the Service Consumer will need the following data:
+Before starting, the Data Consumer will need the following data:
 
 - Their own ID
 - A key pair
@@ -45,11 +45,11 @@ Before starting, the Service Consumer will need the following data:
 
 ##### Perform Resource Request
 
-The ultimate goal of the Service Consumer is to access a resource at a Service Provider, but in order to do so, a number of other actions need to be performed first.
+The ultimate goal of the Data Consumer is to access a resource at a Service Provider, but in order to do so, a number of other actions need to be performed first.
 
 ##### Create Resource Request
 
-The Service Consumer should be familiar with the particular API of the Service Provider, since there is no standard for Service Provider APIs. So the consumer should be able to compose an HTTP request that conforms to the API.
+The Data Consumer should be familiar with the particular API of the Service Provider, since there is no standard for Service Provider APIs. So the consumer should be able to compose an HTTP request that conforms to the API.
 
 ##### Add Delegation Evidence As Request Header
 
@@ -69,7 +69,7 @@ Like all calls in an iSHARE environment, a Bearer Token is required for the dele
 
 ##### Request Authorization Registry Details
 
-To get the ID and the URL of the Authorization Registry, the Service Consumer should perform a `/parties` call on the Association Registry. To make that call, the consumer will need the ID and URL of the Association Registry, the Service Provider ID, and a Bearer Token.
+To get the ID and the URL of the Authorization Registry, the Data Consumer should perform a `/parties` call on the Association Registry. To make that call, the consumer will need the ID and URL of the Association Registry, the Service Provider ID, and a Bearer Token.
 
 ##### Add Bearer Token As Request Header
 

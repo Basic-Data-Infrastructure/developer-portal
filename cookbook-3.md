@@ -6,7 +6,7 @@ order: 3
 
 ### Provider is called without pre-authorization
 
-As Service Provider, handle an authenticated call by a Service Consumer which does not include pre-authorization. The provider will need to perform authorization manually, or contact an Authorization Registry.
+As Service Provider, handle an authenticated call by a Data Consumer which does not include pre-authorization. The provider will need to perform authorization manually, or contact an Authorization Registry.
 
 ### TODO Handle token call
 
