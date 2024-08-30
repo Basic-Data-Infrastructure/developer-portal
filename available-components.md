@@ -35,7 +35,7 @@ This is official iSHARE library which provides core functionality for service co
 
 ### [Postman Collections](https://dev.ishare.eu/demo-and-testing/postman.html)
 
-This link provides access to a set of tools called Postman collections, which are used to manually test how iSHARE APIs work within the BDI architecture. If you’re new to Postman, think of it as an application that lets you simulate how different software systems communicate with each other by sending and receiving data through APIs. In these collections, you’ll be pretending to be a company called “ABC Trucking,” using a special digital key that allows you to interact with the system as if you were that company. This is a safe way to try out the APIs and see how they work.
+This link provides access to a set of tools called Postman collections, which are used to manually test how iSHARE APIs work within the BDI architecture. Postman is a popular API development and collaboration platform that allows developers and teams to design, test, document, and share APIs efficiently. It provides an intuitive interface for sending HTTP requests, examining responses, and automating API workflows through collections. In the collections provided here, you’ll be pretending to be a company called “ABC Trucking,” using a special digital key that allows you to interact with the system as if you were that company. This is a safe way to try out the APIs and see how they work.
 
 ### [iSHARE Authorization Registry](https://github.com/iSHAREScheme/AuthorizationRegistry)
 
