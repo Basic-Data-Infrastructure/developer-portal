@@ -8,6 +8,12 @@ order: 2
 
 As Data Consumer, call the API of a Service Provider while being pre-authorized by an Authorization Registry, which means having received a Delegation Evidence JWT. You'll need to look up the details of the Authorization Register (id and URL) in the Association Register.
 
+### Preparation
+
+Before getting started with this recipe, we recommend that you install the following libraries, using this command:
+
+`npm install axios uuid jsonwebtoken node-forge`
+
 ### Get token
 
 In order to perform a /parties call in the test environment, first one needs to post a client assertion to the /connect/token endpoint. We will use node.js for these examples. To create a client assertion, we use the `jsonwebtoken` library, together with several other common libraries: `fs`, `uuid`, `crypto` and `axios`.

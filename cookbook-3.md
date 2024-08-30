@@ -10,6 +10,14 @@ As Service Provider, handle an authenticated call by a Data Consumer which does 
 
 You will need a private key, a certificate, and an EORI client id.
 
+### Preparation
+
+Before getting started with this recipe, we recommend that you install the following libraries, using this command:
+
+`npm install axios uuid jsonwebtoken node-forge`
+
+### Web Server
+
 Write a simple web server, and call the `token` and `callApi` functions with the appropriate arguments from your request handler.
 Take care to set the correct values for your client id and the locations of the private key and the certificate.
 
