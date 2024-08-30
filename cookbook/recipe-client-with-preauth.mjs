@@ -2,7 +2,6 @@
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import crypto from 'crypto';
 import axios from 'axios';
 
 // file paths
@@ -17,7 +16,6 @@ const ASSOC_EORI = "EU.EORI.NLDILSATTEST1";
 const SP_EORI = "EU.EORI.NL809023854";
 const AR_EORI = 'EU.EORI.NL000000004';
 const pemData = fs.readFileSync(privateKeyPath, 'utf8');
-const publicKey = crypto.createPublicKey(pemData);
 const certificateChainData = fs.readFileSync(certKeyPath, 'utf8');
 // Split the certificate chain into individual certificates
 const certificates = certificateChainData.match(/-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g);
@@ -57,7 +55,7 @@ function signJwt(payload) {
 async function accessToken(eori, tokenUrl) {
   let payload = { "iss": YOUR_EORI, "sub": YOUR_EORI, "aud": eori, "jti": uuidv4() }
   const token = signJwt(payload);
-  response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
+  let response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
   return response.data['access_token'];
 }
 
@@ -72,9 +70,7 @@ function decodeJWT(token) {
   // Decode the Base64Url encoded payload (second part)
   const base64Url = parts[1];
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const payload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
+  const payload = Buffer.from(base64, 'base64').toString('utf8');
 
   // Parse the JSON payload
   return JSON.parse(payload);
@@ -93,7 +89,7 @@ function checkAdherence(adh) {
   }
 }
 
-let bearerToken = accessToken(ASSOC_EORI, tokenUrlAssoc);
+let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
 
 const headersParties = {
   "accept": "application/json",
@@ -109,11 +105,11 @@ console.log(decodedPayload);
 let party = decodedPayload["party_info"];
 console.log(party);
 checkAdherence(party);
-let ar = party["authregistery"][0];
+let ar = party["authregistry"][0];
 
 console.log(ar);
 
-bearerToken = accessToken(AR_EORI, tokenArUrl);
+bearerToken = await accessToken(AR_EORI, tokenArUrl);
 
 const arHeaders = { "Content-Type": "application/json",
                     "Authorization": "Bearer " + bearerToken }
@@ -134,10 +130,12 @@ let body = JSON.stringify({"delegationRequest": {
     "policySets": [ { "policies": [ policy ] } ]
   }})
 // authorization registry /delegation
-response = await axios.post(delegationArUrl, body, { arHeaders });
+response = await axios.post(delegationArUrl, body, { headers: arHeaders });
 let delegationToken = response.data.delegationToken;
 
-bearerToken = accessToken(SP_EORI, tokenSpUrl);
+let tokenSpUrl = ''; // NOTE define the url of the Service Provider's /connect/token endpoint here
+
+bearerToken = await accessToken(SP_EORI, tokenSpUrl);
 const headersApi = {
   "accept": "application/json",
   "Authorization": "Bearer " + bearerToken,
@@ -145,4 +143,5 @@ const headersApi = {
 };
 
 // Make actual API call with delegation evidence token
-response = await axios.post(spApiUrl, body, headersApi);
+let spApiUrl = 'https://service-provider/api'; // Example definition, adjust as needed
+response = await axios.post(spApiUrl, body, { headers: headersApi });

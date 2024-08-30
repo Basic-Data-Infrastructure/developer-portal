@@ -1,17 +1,31 @@
 // requires
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
 const crypto = require('crypto');
 const axios = require('axios');
+const forge = require('node-forge');
+
+// file paths
+
+const privateKeyPath = process.env.HOME + '/.ssh/EU.EORI.NLFLEXTRANS.pem';
+const certKeyPath = process.env.HOME + '/.ssh/EU.EORI.NLFLEXTRANS.crt';
 
 // constants
 
 const tokenUrlAssoc = "https://dilsat1-mw.pg.bdinetwork.org/connect/token";
+const trustedUrlAssoc = "https://dilsat1-mw.pg.bdinetwork.org/trusted_list";
 const partiesUrlAssoc = "https://dilsat1-mw.pg.bdinetwork.org/parties";
 const YOUR_EORI = "EU.EORI.NLFLEXTRANS";
 const ASSOC_EORI = "EU.EORI.NLDILSATTEST1";
-const headersTokenCall = { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" };
+const pemData = fs.readFileSync(privateKeyPath, 'utf8');
+const certificateChainData = fs.readFileSync(certKeyPath, 'utf8');
+// Split the certificate chain into individual certificates
+const certificates = certificateChainData.match(/-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g);
+// Convert each certificate to DER format and then base64 encode it
+const x5c = certificates.map(cert => {
+  return cert.replace(/-----\w+ CERTIFICATE-----/g, '').replace(/\s+/g, '');
+});
 
 let tokenList = {};
 
@@ -40,18 +54,20 @@ function signJwt(payload) {
 async function accessToken(eori, tokenUrl) {
   let payload = { "iss": YOUR_EORI, "sub": YOUR_EORI, "aud": eori, "jti": uuidv4() }
   const token = signJwt(payload);
-  response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
+  let response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
   return response.data['access_token'];
 }
 
 // Decode a base64 encoded JWT fragment (header or payload)
 function decodeJWTFragment(fragment) {
+  // Replace URL-safe Base64 characters with standard Base64 characters
   const base64 = fragment.replace(/-/g, '+').replace(/_/g, '/');
-  const data = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
 
-  return JSON.parse(data);
+  // Decode the Base64 string and parse it as a UTF-8 string
+  const jsonString = Buffer.from(base64, 'base64').toString('utf8');
+
+  // Parse and return the JSON object
+  return JSON.parse(jsonString);
 }
 
 // decode JWT without signature verification
@@ -177,7 +193,7 @@ async function token(clientAssertionJWT) {
   }
 
   // validate the signature (we check with the first certificate in the x5c chain)
-  jwt.verify(token, x5cToPem(x5c[0]));
+  jwt.verify(clientAssertionJWT, x5cToPem(x5c[0]));
 
   // validate the certificate chain (is it a chain? is the CA in our list of accepted associations?)
   let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
@@ -196,7 +212,7 @@ async function token(clientAssertionJWT) {
   // contact the association register to see if the client is still in good standing
 
   // first, get a token
-  bearerToken = accessToken(ASSOC_EORI, tokenUrlAssoc);
+  bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
 
   // then, make the parties call
 
@@ -210,12 +226,23 @@ async function token(clientAssertionJWT) {
   checkAdherence(party["adherence"]);
 
   // generate a token and store it with the expiration date and the client id
-  let token = uuidv4();
+  let uuid = uuidv4();
   let expiresAt = new Date(new Date().getTime() + 30000);
-  tokenList[token] = { clientId: clientId, expiresAt: expiresAt };
+  tokenList[uuid] = { clientId: clientId, expiresAt: expiresAt };
 
   // return the token
-  return token;
+  return uuid;
+}
+
+function checkToken(token) {
+  let tokenData = tokenList[token];
+  if(tokenData) {
+    delete tokenList[token];
+    if(tokenData.expiresAt >=  new Date()) {
+      return tokenData.clientId;
+    }
+  }
+  throw new Error("")
 }
 
 function callApi(token, request) {

@@ -16,18 +16,32 @@ Take care to set the correct values for your client id and the locations of the 
 ```
 // requires
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
 const crypto = require('crypto');
 const axios = require('axios');
+const forge = require('node-forge');
+
+// file paths
+
+const privateKeyPath = process.env.HOME + '/.ssh/EU.EORI.NLFLEXTRANS.pem';
+const certKeyPath = process.env.HOME + '/.ssh/EU.EORI.NLFLEXTRANS.crt';
 
 // constants
 
 const tokenUrlAssoc = "https://dilsat1-mw.pg.bdinetwork.org/connect/token";
+const trustedUrlAssoc = "https://dilsat1-mw.pg.bdinetwork.org/trusted_list";
 const partiesUrlAssoc = "https://dilsat1-mw.pg.bdinetwork.org/parties";
 const YOUR_EORI = "EU.EORI.NLFLEXTRANS";
 const ASSOC_EORI = "EU.EORI.NLDILSATTEST1";
-const headersTokenCall = { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" };
+const pemData = fs.readFileSync(privateKeyPath, 'utf8');
+const certificateChainData = fs.readFileSync(certKeyPath, 'utf8');
+// Split the certificate chain into individual certificates
+const certificates = certificateChainData.match(/-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g);
+// Convert each certificate to DER format and then base64 encode it
+const x5c = certificates.map(cert => {
+  return cert.replace(/-----\w+ CERTIFICATE-----/g, '').replace(/\s+/g, '');
+});
 
 let tokenList = {};
 
@@ -56,18 +70,20 @@ function signJwt(payload) {
 async function accessToken(eori, tokenUrl) {
   let payload = { "iss": YOUR_EORI, "sub": YOUR_EORI, "aud": eori, "jti": uuidv4() }
   const token = signJwt(payload);
-  response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
+  let response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
   return response.data['access_token'];
 }
 
 // Decode a base64 encoded JWT fragment (header or payload)
 function decodeJWTFragment(fragment) {
+  // Replace URL-safe Base64 characters with standard Base64 characters
   const base64 = fragment.replace(/-/g, '+').replace(/_/g, '/');
-  const data = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
 
-  return JSON.parse(data);
+  // Decode the Base64 string and parse it as a UTF-8 string
+  const jsonString = Buffer.from(base64, 'base64').toString('utf8');
+
+  // Parse and return the JSON object
+  return JSON.parse(jsonString);
 }
 
 // decode JWT without signature verification
@@ -105,7 +121,35 @@ function checkAdherence(adh) {
   }
 }
 
-function validateCertificateChain(certificates) {
+// Return hex (upcase) fingerprint for certificate
+function fingerprint(base64Cert) {
+  // Step 1: Decode base64
+  const derBuffer = Buffer.from(base64Cert, 'base64');
+
+  // Step 2: Compute the SHA-256 hash of the DER-encoded certificate, and convert the hash to uppercase
+  return crypto.createHash('sha256').update(derBuffer).digest('hex').toUpperCase();
+}
+
+function checkTrust(trustedList, certificate) {
+  let certFingerprint = fingerprint(certificate);
+  for(let i=0; i < trustedList.length; i++) {
+    let c = trustedList[i];
+    if(c.certificate_fingerprint == certFingerprint) {
+      console.log(c);
+      return true;
+    }
+  }
+  return false;
+}
+
+function validateCertificateChain(trustedList, x5c) {
+  // validate the certificate chain (is it a chain? is the CA in our list of accepted associations?)
+  const certificates = x5c.map(certBase64 => {
+    const certDer = forge.util.decode64(certBase64);
+    const asn1Obj = forge.asn1.fromDer(certDer);
+    return forge.pki.certificateFromAsn1(asn1Obj);
+  });
+
   try {
     for (let i = 0; i < certificates.length - 1; i++) {
       const subjectCert = certificates[i];
@@ -129,29 +173,12 @@ function validateCertificateChain(certificates) {
       return false;
     }
 
-    let serialNumber = rootCert.serialNumber;
-    let trustedCertificatesSN = ["04b536719019a8b1"];
-    for(i=0; i<trustedCertificatesSN.length; i++) {
-      if(serialNumber === trustedCertificatesSN[i]) {
-        return true;
-      }
-    }
-    return false;
+    let rootCertX5c = x5c[x5c.length-1];
+    return checkTrust(trustedList, rootCertX5c);
   } catch (err) {
     console.error('Error during certificate chain validation:', err.message);
     return false;
   }
-}
-
-try {
-  const isValid = validateCertificateChain(certificates);
-  if (isValid) {
-    console.log('Certificate chain is valid.');
-  } else {
-    console.error('Certificate chain validation failed.');
-  }
-} catch (err) {
-  console.error('Error during validation:', err.message);
 }
 
 // After a user has made a http request for the token, extract the client assertion and call this function.
@@ -182,38 +209,32 @@ async function token(clientAssertionJWT) {
   }
 
   // validate the signature (we check with the first certificate in the x5c chain)
-  jwt.verify(token, x5cToPem(x5c[0]));
+  jwt.verify(clientAssertionJWT, x5cToPem(x5c[0]));
 
   // validate the certificate chain (is it a chain? is the CA in our list of accepted associations?)
-  const certs = x5c.map(certBase64 => {
-    const certDer = forge.util.decode64(certBase64);
-    const asn1Obj = forge.asn1.fromDer(certDer);
-    return forge.pki.certificateFromAsn1(asn1Obj);
-  });
+  let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
+  const authenticatedHeader = {
+    "accept": "application/json",
+    "Authorization": "Bearer " + bearerToken
+  };
 
-  if (!validateCertificateChain(certs)) {
+  let response = await axios.get(trustedUrlAssoc, { headers: authenticatedHeader, params: {} });
+  const trustedList = decodeJWT(response.data.trusted_list_token).trusted_list;
+
+  if (!validateCertificateChain(trustedList, x5c)) {
     throw new Error("Certificate chain invalid");
   }
 
   // contact the association register to see if the client is still in good standing
 
   // first, get a token
-  let bearerToken = accessToken(ASSOC_EORI, tokenUrlAssoc);
+  bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
 
   // then, make the parties call
 
   const headersParties = { "accept": "application/json", "Authorization": "Bearer " + bearerToken };
-  // TODO just get the party for the client id
-  const params = {
-    "active_only": "true",
-    "certified_only": "false",
-    "adherenceStatus": "Active",
-    "framework": "iSHARE",
-    "publiclyPublishable": "false",
-    "page": "1"
-  };
 
-  let partiesResponse = await axios.get(partiesUrlAssoc + '/' + clientId, { headers: headersParties, params: params });
+  let partiesResponse = await axios.get(partiesUrlAssoc + '/' + clientId, { headers: headersParties, params: {} });
   let partyToken = partiesResponse.data['party_token'];
   const decodedPayload = decodeJWT(partyToken);
   let party = decodedPayload["payload"]["party_info"];
@@ -221,12 +242,23 @@ async function token(clientAssertionJWT) {
   checkAdherence(party["adherence"]);
 
   // generate a token and store it with the expiration date and the client id
-  let token = uuidv4();
+  let uuid = uuidv4();
   let expiresAt = new Date(new Date().getTime() + 30000);
-  tokenList[token] = { clientId: clientId, expiresAt: expiresAt };
+  tokenList[uuid] = { clientId: clientId, expiresAt: expiresAt };
 
   // return the token
-  return token;
+  return uuid;
+}
+
+function checkToken(token) {
+  let tokenData = tokenList[token];
+  if(tokenData) {
+    delete tokenList[token];
+    if(tokenData.expiresAt >=  new Date()) {
+      return tokenData.clientId;
+    }
+  }
+  throw new Error("")
 }
 
 function callApi(token, request) {
