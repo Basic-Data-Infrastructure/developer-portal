@@ -1,7 +1,7 @@
 ---
-title: Handle pre-authorized call
-category: A. Cookbook
-order: 4
+# title: Handle pre-authorized call
+# category: A. Cookbook
+# order: 4
 ---
 
 ### Provider is called with pre-authorization

@@ -1,7 +1,7 @@
 ---
-title: Pre-authorized call
-category: A. Cookbook
-order: 2
+# title: Pre-authorized call
+# category: A. Cookbook
+# order: 2
 ---
 
 ### Consumer makes call with pre-authorization

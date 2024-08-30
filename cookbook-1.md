@@ -1,7 +1,7 @@
 ---
-title: Call without pre-authorization
-category: A. Cookbook
-order: 1
+# title: Call without pre-authorization
+# category: A. Cookbook
+# order: 1
 ---
 
 ### Consumer makes call without pre-authorization

@@ -1,7 +1,7 @@
 ---
-title: Handle call without pre-authorization
-category: A. Cookbook
-order: 3
+# title: Handle call without pre-authorization
+# category: A. Cookbook
+# order: 3
 ---
 
 ### Provider is called without pre-authorization
@@ -194,7 +194,7 @@ function validateCertificateChain(trustedList, x5c) {
 // within the configured expiration date, or throw an error.
 async function token(clientAssertionJWT) {
   // decode JWT
-  const decodedJWT = decodeJWT(clientAssertionJWT);
+  const decodedJWT = decodeJWTWithHeader(clientAssertionJWT);
   const header = decodedJWT['header'];
   const payload = decodedJWT['payload'];
   const x5c = header["x5c"];
