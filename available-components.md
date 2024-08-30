@@ -33,6 +33,10 @@ Noodle Bar facilitates setting up dataspaces that follow certain principles, ser
 
 This is official iSHARE library which provides core functionality for service consumers. In other words, it encapsulates HTTP request calls towards iSHARE endpoints, JWT response validation and mapping business logic.
 
+### [Postman Collections](https://dev.ishare.eu/demo-and-testing/postman.html)
+
+This link provides access to a set of tools called Postman collections, which are used to manually test how iSHARE APIs work within the BDI architecture. Postman is a popular API development and collaboration platform that allows developers and teams to design, test, document, and share APIs efficiently. It provides an intuitive interface for sending HTTP requests, examining responses, and automating API workflows through collections. In the collections provided here, you’ll be pretending to be a company called “ABC Trucking,” using a special digital key that allows you to interact with the system as if you were that company. This is a safe way to try out the APIs and see how they work.
+
 ### [iSHARE Authorization Registry](https://github.com/iSHAREScheme/AuthorizationRegistry)
 
 _The Authorization Register-code that is in this repository is not a 'production-ready' Authorization Register, meaning it has a limited set of functionalities. It can be used in proof of concepts or pilots to showcase the iSHARE Authorization protocol, however many functionalities can be improved. Furthermore, it should be noted that only the request and return made to the /delegation endpoint (as described on our Developer Portal) is specified within the iSHARE standards. How an authorization registry registers policies and translates these into delegation evidence is up to the authorization registry. This code only provides one of the options to do so._
