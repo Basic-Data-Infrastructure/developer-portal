@@ -15,3 +15,10 @@ To extend a service provider API and make it BDI compatible, at minimum you will
 Also, you'll have to extend all API calls with a check to see whether they include a valid token in the header, and check to see if they include a delegation evidence JWT. That JWT should be valid (right sender and recipient, and signed correctly) and the policies in its payload should allow access to the current API call.
 
 If all that is correct, the API call may proceed.
+
+## Non-HTTP services
+
+The BDI generally assumes that a Service is implemented as a online HTTP API. If the service uses another online protocol, it may be useful to translate parts of the protocols and/or "bridge" service with HTTP components. For instance, a service can provide an HTTP `/connect/token` endpoint for authentication, returning an access token as usual. The Data Consumer can then use the access token as a credential in some other protocol.
+
+If the Service does not implement online API at all, the basic service looks a lot like a Data Consumer from the point of view of the BDI architecture; for an exammple, see the [DIL - Demo Vertrouwde Goederenafgifte](https://github.com/Basic-Data-Infrastructure/demo-vertrouwde-goederenafgifte/blob/master/doc/architecture/architecture-description.md) architecture. Here, parties authorize (using Authorization Registers) physical access to consignments at a distribution center.
+
