@@ -10,7 +10,7 @@ BDI is an architecture that enables services to allow unknown clients to access 
 
 #### Key Concepts and Components
 
-The core services in a BDI architecture are the API consumer, the API provider, Association Register, and the Authorization Register.
+The core services in a BDI architecture are the API consumer, the Service Provider, Association Register, and the Authorization Register.
 
 ##### Service Provider
 
