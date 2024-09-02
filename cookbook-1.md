@@ -6,7 +6,7 @@ order: 1
 
 ### Consumer makes call without pre-authorization
 
-As Service Consumer, call the API of a Service Provider without being pre-authorized by an Authorization Registry. You'll need to authenticate with an Association Registry first.
+As Data Consumer, call the API of a Service Provider without being pre-authorized by an Authorization Registry. You'll need to authenticate with an Association Registry first.
 
 ### Get token
 

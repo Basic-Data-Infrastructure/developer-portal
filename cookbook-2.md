@@ -6,7 +6,7 @@ order: 2
 
 ### Consumer makes call with pre-authorization
 
-As Service Consumer, call the API of a Service Provider while being pre-authorized by an Authorization Registry. You'll need to authenticate with an Association Registry first.
+As Data Consumer, call the API of a Service Provider while being pre-authorized by an Authorization Registry. You'll need to authenticate with an Association Registry first.
 
 ### Get token
 
