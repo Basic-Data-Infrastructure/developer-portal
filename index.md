@@ -12,6 +12,10 @@ BDI is an architecture that enables services to allow unknown clients to access 
 
 The core services in a BDI architecture are the API consumer, the Service Provider, Association Register, and the Authorization Register.
 
+##### Data Owner
+
+Party who is entitled to have control over data and access to data, and controls decision on data sovereignty and trust sovereignty. It is responsible for authorization policies kept in an Authorization Register.
+
 ##### Service Provider
 
 The Service Provider exposes an API that is accessible to authenticated and authorized clients. Only the authentication and authorization are standardized - BDI does not mandate any standards for the API itself. Some standards are recommended (Open Trip Model), but the API may provide any kind of data in any format, whether that's JSON, XML, CSV or a custom binary format.
@@ -26,7 +30,7 @@ The Association Register is a register of all known participants in the system. 
 
 ##### Authorization Register
 
-The Authorization Register knows about roles and permissions. You give it a request for what resource you would like to access, via what API call, and in what way (read, create, update) and it will give you a digital permission slip, if you indeed have access to that resource. This permission slip, known as “delegation evidence,” can then be passed to the Service Provider, enabling access. The Service Provider has delegated its authorization procedure to the Authorization Register.
+The Authorization Register acts as an information point on authorizations to data belonging to a Data Owner. The register can follow any logic required by the Data Owner (role-based, permission based, etc). A Service Consumer can give it a request for what resource you would like to access, via what API call, and in what way (read, create, update) and it will give out a digital permission slip, if the Service Consumer indeed has access to that resource. This permission slip, known as “delegation evidence,” can then be passed to the Service Provider. The Service Provider can use the Delegation Evidence in its authorization logic.
 
 #### Developer’s Role in BDI
 
