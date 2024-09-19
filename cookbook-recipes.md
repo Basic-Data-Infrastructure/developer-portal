@@ -303,7 +303,7 @@ function checkToken(token, tokenList) {
 
 ### Consumer makes call without pre-authorization
 
-As Service Consumer, call the API of a Service Provider without being pre-authorized by an Authorization Registry. It is recommended to check the adherence status of the Service Provider first with the Association Register. The Service Provider may try to obtain authorization at a Authorization Register, or it may try to authorize you in an ad hoc way.
+As Data Consumer, call the API of a Service Provider without being pre-authorized by an Authorization Registry. It is recommended to check the adherence status of the Service Provider first with the Association Register. The Service Provider may try to obtain authorization at a Authorization Register, or it may try to authorize you in an ad hoc way.
 
 ```
 let party = lookupParty(SP_EORI, YOUR_CLIENT_EORI);
@@ -328,7 +328,7 @@ response = await axios.post(spApiUrl, body, headersApi);
 
 ### Consumer makes call with pre-authorization
 
-As Service Consumer, call the API of a Service Provider while being pre-authorized by an Authorization Registry, which means having received a Delegation Evidence JWT. You'll need to look up the details of the Authorization Register (id and URL) in the Association Register.
+As Data Consumer, call the API of a Service Provider while being pre-authorized by an Authorization Registry, which means having received a Delegation Evidence JWT. You'll need to look up the details of the Authorization Register (id and URL) in the Association Register.
 
 ```
 let party = lookupParty(SP_EORI, YOUR_CLIENT_EORI);
@@ -372,7 +372,7 @@ response = await axios.post(spApiUrl, body, { headers: headersApi });
 
 ### Provider is called without pre-authorization
 
-As Service Provider, handle an authenticated call by a Service Consumer which does not include pre-authorization. The provider will need to perform authorization manually, or contact an Authorization Registry.
+As Service Provider, handle an authenticated call by a Data Consumer which does not include pre-authorization. The provider will need to perform authorization manually, or contact an Authorization Registry.
 
 ```
 // After a user has made a http request for the token, extract the client assertion and call this function.
@@ -475,7 +475,7 @@ async function callApi(token, request) {
 
 ### Provider is called with pre-authorization
 
-As Service Provider, handle an authenticated call by a Service Consumer which includes pre-authorization. The provider will need to check whether the pre-authorization is valid and compatible with the action.
+As Service Provider, handle an authenticated call by a Data Consumer which includes pre-authorization. The provider will need to check whether the pre-authorization is valid and compatible with the action.
 
 ```
 // After a user has made a http request for the token, extract the client assertion and call this function.
@@ -558,7 +558,7 @@ function callApi(token, delegationToken, request) {
 
 ### Provider is called without external authorization
 
-As Service Provider, handle an authenticated call by a Service Consumer which does not include pre-authorization. The provider must perform authorization manually.
+As Service Provider, handle an authenticated call by a Data Consumer which does not include pre-authorization. The provider must perform authorization manually.
 
 ```
 // After a user has made a http request for the token, extract the client assertion and call this function.

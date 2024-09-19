@@ -6,7 +6,7 @@
 
 ### Provider is called without external authorization
 
-As Service Provider, handle an authenticated call by a Service Consumer which does not include pre-authorization. The provider must perform authorization manually.
+As Service Provider, handle an authenticated call by a Data Consumer which does not include pre-authorization. The provider must perform authorization manually.
 
 You will need a private key, a certificate, and an EORI client id.
 
