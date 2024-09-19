@@ -3,7 +3,7 @@
 // within the configured expiration date, or throw an error.
 async function token(clientAssertionJWT) {
   // decode JWT
-  const { header, payload } = decodeJWTWithHeader(clientAssertionJWT);
+  const { header, payload } = decodeJWT(clientAssertionJWT);
   const x5c = header["x5c"];
   const clientId = payload["iss"];
 
@@ -19,7 +19,7 @@ async function token(clientAssertionJWT) {
     throw new Error("JWT is expired");
   }
 
-  if (audience !== YOUR_EORI) {
+  if (audience !== YOUR_SP_EORI) {
     throw new Error('Wrong audience');
   }
 
@@ -27,32 +27,22 @@ async function token(clientAssertionJWT) {
   jwt.verify(clientAssertionJWT, x5cToPem(x5c[0]));
 
   // validate the certificate chain (is it a chain? is the CA in our list of accepted associations?)
-  let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
+  let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc, YOUR_SP_EORI);
   const authenticatedHeader = {
     "accept": "application/json",
     "Authorization": "Bearer " + bearerToken
   };
 
   let response = await axios.get(trustedUrlAssoc, { headers: authenticatedHeader, params: {} });
-  const trustedList = decodeJWT(response.data.trusted_list_token).trusted_list;
+  const trustedList = decodeJWT(response.data.trusted_list_token).payload.trusted_list;
 
   if (!validateCertificateChain(trustedList, x5c)) {
     throw new Error("Certificate chain invalid");
   }
 
   // contact the association register to see if the client is still in good standing
+  let party = lookupParty(clientId, YOUR_SP_EORI);
 
-  // first, get a token
-  bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
-
-  // then, make the parties call
-
-  const headersParties = { "accept": "application/json", "Authorization": "Bearer " + bearerToken };
-
-  let partiesResponse = await axios.get(partiesUrlAssoc + '/' + clientId, { headers: headersParties, params: {} });
-  let partyToken = partiesResponse.data['party_token'];
-  const decodedPayload = decodeJWTWithHeader(partyToken);
-  let party = decodedPayload["payload"]["party_info"];
   // check adherence of client
   checkAdherence(party["adherence"]);
 
@@ -65,10 +55,10 @@ async function token(clientAssertionJWT) {
   return uuid;
 }
 
-let party = lookupParty(SP_EORI);
+let party = lookupParty(SP_EORI, YOUR_SP_EORI);
 checkAdherence(party);
-const {arEori, tokenArUrl, delegationArUrl} = extractAuthRegisterFromParty(party);
-bearerToken = await accessToken(arEori, tokenArUrl);
+const {arEori, tokenArUrl, _delegationArUrl} = extractAuthRegisterFromParty(party);
+bearerToken = await accessToken(arEori, tokenArUrl, YOUR_SP_EORI);
 
 // This should be customized based on the actual API call of the Service Provider
 function createDelegationMask(request) {
@@ -92,12 +82,12 @@ function createDelegationMask(request) {
 }
 
 async function callApi(token, request) {
-  let clientId = checkToken(token, tokenList);
-  let delegationMask = createDelegationMask(request);
-  let party = lookupParty(SP_EORI);
+  checkToken(token, tokenList);
+  let delegationRequest = createDelegationMask(request);
+  let party = lookupParty(SP_EORI, YOUR_SP_EORI);
   checkAdherence(party);
   const {arEori, tokenArUrl, delegationArUrl} = extractAuthRegisterFromParty(party);
-  let bearerToken = await accessToken(arEori, tokenArUrl);
+  let bearerToken = await accessToken(arEori, tokenArUrl, YOUR_SP_EORI);
   let delegationToken = fetchDelegationEvidence(delegationArUrl, delegationRequest, bearerToken);
   checkDelegationToken(delegationToken); // implement this to see if you have received authorization
   performApiCall(request); // implement the actual API call here

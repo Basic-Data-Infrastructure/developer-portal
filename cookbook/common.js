@@ -13,7 +13,8 @@ const certKeyPath = process.env.HOME + '/.ssh/EU.EORI.NLFLEXTRANS.crt'; // NOTE:
 
 // constants
 
-const YOUR_EORI = "EU.EORI.NLFLEXTRANS"; // NOTE: Example definition, adjust as needed
+const YOUR_CLIENT_EORI = "EU.EORI.NLFLEXTRANS"; // NOTE: Example definition, adjust as needed
+const YOUR_SP_EORI = "EU.EORI.NLFLEXTRANS"; // NOTE: Example definition, adjust as needed
 const ASSOC_EORI = "EU.EORI.NLDILSATTEST1"; // NOTE: Example definition, adjust as needed
 const SP_EORI = "EU.EORI.NL809023854"; // NOTE: Example definition, adjust as needed
 const AR_EORI = 'EU.EORI.NL000000004'; // NOTE: Example definition, adjust as needed
@@ -46,7 +47,7 @@ function createClientAssertion(token) {
   return new URLSearchParams({
     "grant_type": "client_credentials",
     "scope": "iSHARE",
-    "client_id": YOUR_EORI,
+    "client_id": YOUR_CLIENT_EORI,
     "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
     "client_assertion": token
   })
@@ -62,29 +63,47 @@ function signJwt(payload) {
   return jwt.sign(payload, pemData, { algorithm: 'RS256', expiresIn: "30s", header: header });
 }
 
+// Check whether a jwt, split in parts, has been signed correctly (with the certificate in the x5c field in the header)
+function verifySignature(parts) {
+  // Step 1: Extract the header
+  const header = JSON.parse(Buffer.from(parts[0].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'));
+
+  // Step 2: Extract x5c from header
+  const x5c = header.x5c;  // This is an array of Base64-encoded certificates
+
+  // Step 3: Convert the x5c certificate to PEM format
+  const cert = `-----BEGIN CERTIFICATE-----\n${x5c[0].match(/.{1,64}/g).join('\n')}\n-----END CERTIFICATE-----`;
+
+  // Step 4: Convert certificate to public key
+  const publicKey = crypto.createPublicKey(cert);
+
+  // Step 5: Create the signed text (header and payload, joined by a dot)
+  const signedText = parts[0] + '.' + parts[1];
+
+  // Step 6: Convert signature from base64url to base64
+  const signature = Buffer.from(parts[2].replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+
+  // Step 7: Verify the signature using the public key
+  const isValid = crypto.verify(
+    'sha256',                                  // Algorithm for RS256 is SHA-256
+    Buffer.from(signedText),                   // Data to verify (header and payload)
+    publicKey,                                 // Public key
+    signature                                  // Signature to verify
+  );
+
+  if (isValid) {
+    console.log("Signature OK")
+  } else {
+    throw new Error("Signature does not match");
+  }
+}
+
 // Call /token endpoint and return access_token
-async function accessToken(eori, tokenUrl) {
-  let payload = { "iss": YOUR_EORI, "sub": YOUR_EORI, "aud": eori, "jti": uuidv4() }
+async function accessToken(eori, tokenUrl, yourEori) {
+  let payload = { "iss": yourEori, "sub": yourEori, "aud": eori, "jti": uuidv4() }
   const token = signJwt(payload);
   let response = await axios.post(tokenUrl, createClientAssertion(token), { "accept": "application/json", "Content-Type": "application/x-www-form-urlencoded" })
   return response.data['access_token'];
-}
-
-// decode JWT without signature verification
-function decodeJWT(token) {
-  // Split the JWT into its three parts: header, payload, and signature
-  const parts = token.split('.');
-  if (parts.length !== 3) {
-      throw new Error('Invalid JWT');
-  }
-
-  // Decode the Base64Url encoded payload (second part)
-  const base64Url = parts[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const payload = Buffer.from(base64, 'base64').toString('utf8');
-
-  // Parse the JSON payload
-  return JSON.parse(payload);
 }
 
 // Decode a base64 encoded JWT fragment (header or payload)
@@ -99,9 +118,26 @@ function decodeJWTFragment(fragment) {
   return JSON.parse(jsonString);
 }
 
+// decode JWT with signature verification
+function decodeJWT(token) {
+  // Split the JWT into its three parts: header, payload, and signature
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+      throw new Error('Invalid JWT');
+  }
+
+  // Decode the Base64Url encoded payload (second part)
+  const header = decodeJWTFragment(parts[0]);
+  const payload = decodeJWTFragment(parts[1]);
+  console.log("header");
+  console.log(header);
+  verifySignature(parts);
+  return { header, payload };
+}
+
 // Lookup party in Association Register
-async function lookupParty(eori) {
-  let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
+async function lookupParty(eori, yourEori) {
+  let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc, yourEori);
 
   const headersParties = {
     "accept": "application/json",
@@ -112,7 +148,7 @@ async function lookupParty(eori) {
   response = await axios.get(partiesUrlAssoc + '/' + eori, { headers: headersParties, params: {} })
   let partyToken = response.data.party_token;
 
-  const decodedPayload = decodeJWT(partyToken);
+  const decodedPayload = decodeJWT(partyToken).payload;
   let party = decodedPayload["party_info"];
   return party;
 }
@@ -136,20 +172,6 @@ async function fetchDelegationEvidence(delegationArUrl, delegationRequest) {
   // authorization registry /delegation
   response = await axios.post(delegationArUrl, body, { headers: arHeaders });
   return response.data.delegationToken;
-}
-
-// decode JWT without signature verification
-function decodeJWTWithHeader(token) {
-  // Split the JWT into its three parts: header, payload, and signature
-  const parts = token.split('.');
-  if (parts.length !== 3) {
-      throw new Error('Invalid JWT');
-  }
-
-  // Decode the Base64Url encoded payload (second part)
-  const header = decodeJWTFragment(parts[0]);
-  const payload = decodeJWTFragment(parts[1]);
-  return { header, payload };
 }
 
 // check if party is still adherent according to association register

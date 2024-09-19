@@ -21,7 +21,7 @@ async function token(clientAssertionJWT) {
     throw new Error("JWT is expired");
   }
 
-  if (audience !== YOUR_EORI) {
+  if (audience !== YOUR_SP_EORI) {
     throw new Error('Wrong audience');
   }
 
@@ -29,14 +29,14 @@ async function token(clientAssertionJWT) {
   jwt.verify(clientAssertionJWT, x5cToPem(x5c[0]));
 
   // validate the certificate chain (is it a chain? is the CA in our list of accepted associations?)
-  let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
+  let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc, YOUR_SP_EORI);
   const authenticatedHeader = {
     "accept": "application/json",
     "Authorization": "Bearer " + bearerToken
   };
 
   let response = await axios.get(trustedUrlAssoc, { headers: authenticatedHeader, params: {} });
-  const trustedList = decodeJWT(response.data.trusted_list_token).trusted_list;
+  const trustedList = decodeJWT(response.data.trusted_list_token).payload.trusted_list;
 
   if (!validateCertificateChain(trustedList, x5c)) {
     throw new Error("Certificate chain invalid");
@@ -45,7 +45,7 @@ async function token(clientAssertionJWT) {
   // contact the association register to see if the client is still in good standing
 
   // first, get a token
-  bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
+  bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc, YOUR_SP_EORI);
 
   // then, make the parties call
 
@@ -53,7 +53,7 @@ async function token(clientAssertionJWT) {
 
   let partiesResponse = await axios.get(partiesUrlAssoc + '/' + clientId, { headers: headersParties, params: {} });
   let partyToken = partiesResponse.data['party_token'];
-  const decodedPayload = decodeJWTWithHeader(partyToken);
+  const decodedPayload = decodeJWT(partyToken);
   let party = decodedPayload["payload"]["party_info"];
   // check adherence of client
   checkAdherence(party["adherence"]);

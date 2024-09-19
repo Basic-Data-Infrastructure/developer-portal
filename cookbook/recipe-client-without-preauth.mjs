@@ -1,20 +1,9 @@
-let bearerToken = await accessToken(ASSOC_EORI, tokenUrlAssoc);
-const headersParties = {
-  "accept": "application/json",
-  "Authorization": "Bearer " + bearerToken
-};
-
-// association registry /parties
-response = await axios.get(partiesUrlAssoc + '/' + SP_EORI, { headers: headersParties, params: {} })
-let partyToken = response.data['party_token'];
-
-const decodedPayload = decodeJWT(partyToken);
-let party = decodedPayload["party_info"];
+let party = lookupParty(SP_EORI, YOUR_CLIENT_EORI);
 checkAdherence(party);
 
 let tokenSpUrl = ''; // NOTE define the url of the Service Provider's /connect/token endpoint here
 
-bearerToken = await accessToken(SP_EORI, tokenSpUrl);
+bearerToken = await accessToken(SP_EORI, tokenSpUrl, YOUR_CLIENT_EORI);
 const headersApi = {
   "accept": "application/json",
   "Authorization": "Bearer " + bearerToken

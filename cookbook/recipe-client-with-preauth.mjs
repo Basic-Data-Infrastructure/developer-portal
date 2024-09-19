@@ -1,7 +1,7 @@
-let party = lookupParty(SP_EORI);
+let party = lookupParty(SP_EORI, YOUR_CLIENT_EORI);
 checkAdherence(party);
 const {arEori, tokenArUrl, delegationArUrl} = extractAuthRegisterFromParty(party);
-bearerToken = await accessToken(arEori, tokenArUrl);
+bearerToken = await accessToken(arEori, tokenArUrl, YOUR_CLIENT_EORI);
 const policy = {
   "target": {
     "resource": {
@@ -23,7 +23,7 @@ let delegationToken = fetchDelegationEvidence(delegationArUrl, delegationRequest
 
 let tokenSpUrl = ''; // NOTE define the url of the Service Provider's /connect/token endpoint here
 
-bearerToken = await accessToken(SP_EORI, tokenSpUrl);
+bearerToken = await accessToken(SP_EORI, tokenSpUrl, YOUR_CLIENT_EORI);
 const headersApi = {
   "accept": "application/json",
   "Authorization": "Bearer " + bearerToken,
