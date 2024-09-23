@@ -12,7 +12,7 @@ With this token, clients may use the API of the Association Register. Using the 
 
 Service providers will use this call to authenticate requests from Data Consumers and can use the party info to evaluate the trust status of the consumer.
 
-Note that Data Consumers in do not need to interact with the Assocation Register directly, though they need to make sure their record is up-to-date with the Assocation.
+Note that Data Consumers do not need to interact with the Association Register directly, though they need to make sure their record is up-to-date with the Association.
 
 ##### Core Functions of the Association Register
 
@@ -34,6 +34,6 @@ Lists the Authorization Registries associated with each participant. These regis
 
 Contains agreements and legal documents that outline the terms of participation and data sharing. This ensures transparency and legal compliance among participants.
 
-###### Trust roots
+###### Trust Roots
 
-The BDI framework makes extensive use of public-key cryptography. The Assocation Register provides a "Trusted List" of Certificate Authorities (Root CAs) that are trusted to provide certificates for registered parties.
+The BDI framework makes extensive use of public-key cryptography. The Association Register provides a "Trusted List" of Certificate Authorities (Root CAs) that are trusted to provide certificates for registered parties.

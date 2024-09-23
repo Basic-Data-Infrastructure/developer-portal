@@ -10,6 +10,6 @@ First, whether you are developing a Data Consumer or a Service Provider, you wil
 
 We have provided cookbook recipes for several common scenarios. These are written in JavaScript. You can find links to them in the sidebar on the left.
 
-If you prefer to use another language, that is possible too. The cryptography used in BDI, such as parsing certificate chains and verifying them is standard and will have implementations in practically every language, and even the JWT standard has been so widely accepted as to have implementations in [nearly 40 languages](https://jwt.io/libraries).
+If you prefer to use another language, that is possible too. The cryptography used in BDI, such as parsing certificate chains and verifying them, is standard and will have implementations in practically every language, and even the JWT standard has been so widely accepted as to have implementations in [nearly 40 languages](https://jwt.io/libraries).
 
 To implement a Data Consumer is to make a series of HTTP calls. Implementing a Service Provider requires writing an HTTP server with two endpoints, which perform a series of HTTP calls.

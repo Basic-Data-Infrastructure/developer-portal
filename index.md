@@ -14,7 +14,7 @@ The core services in a BDI architecture are the API consumer, the Service Provid
 
 ##### Data Owner
 
-Party who is entitled to have control over data and access to data, and controls decision on data sovereignty and trust sovereignty. It is responsible for authorization policies kept in an Authorization Register.
+The party who is entitled to have control over data and access to data, and controls decision on data sovereignty and trust sovereignty. It is responsible for authorization policies kept in an Authorization Register.
 
 ##### Service Provider
 
@@ -26,18 +26,18 @@ The Data Consumer is able to request authentication and authorization via the BD
 
 ##### Association Register
 
-The Association Register is a register of all known participants in the system. There is no single global system; instead, there are many BDI compatible systems, and therefore many Association Registers. For every participant, they store its id, current compliance status, legal agreements, etc. They also have a list of Authorization Registers for each participant. The purpose of Association Registers is to provide up-to-date information about all participants.
+The Association Register is a register of all known participants in the system. There is no single global system; instead, there are many BDI compatible systems, and therefore many Association Registers. For every participant, they store its ID, current compliance status, legal agreements, etc. They also have a list of Authorization Registers for each participant. The purpose of Association Registers is to provide up-to-date information about all participants.
 
 ##### Authorization Register
 
-The Authorization Register acts as an information point on authorizations to data belonging to a Data Owner. The register can follow any logic required by the Data Owner (role-based, permission based, etc). A Data Consumer can give it a request for what resource you would like to access, via what API call, and in what way (read, create, update) and it will give out a digital permission slip, if the Data Consumer indeed has access to that resource. This permission slip, known as “delegation evidence,” can then be passed to the Service Provider. The Service Provider can use the Delegation Evidence in its authorization logic.
+The Authorization Register acts as an information point on authorizations to data belonging to a Data Owner. The register can follow any logic required by the Data Owner (role-based, permission-based, etc.). A Data Consumer can give it a request for what resource they would like to access, via what API call, and in what way (read, create, update), and it will give out a digital permission slip, if the Data Consumer indeed has access to that resource. This permission slip, known as "delegation evidence" can then be passed to the Service Provider. The Service Provider can use the Delegation Evidence in its authorization logic.
 
-#### Developer’s Role in BDI
+#### Developer's Role in BDI
 
 The main way in which developers participate in BDI is by writing Data Consumers and Service Providers. It is important to understand the role and purpose of all components involved, in order to maintain the security of the services. The largest part of working in a BDI architecture is managing credentials, calling the Association Register and Authorization Register services, and checking the output of these services. Skipping steps, such as not verifying the signature of a JSON Web Token, will compromise the security of the service you are implementing.
 
 #### Technical Overview
 
-All services provide a `/connect/token` endpoint used to get a Bearer Token, which is needed to access other calls on the service. The Association Register has a [`/parties`](https://dev.ishare.eu/ishare-satellite-role/single-party) endpoint which is used to retrieve information about specific participants. It also has a [`/trusted_list`](https://dev.ishare.eu/ishare-satellite-role/trusted-list) which lists all Certificate Authorities that are trusted.
+All services provide a [`/connect/token`](https://dev.ishare.eu/all-roles-common-endpoints/access-token-m2m-1) endpoint used to get a Bearer Token, which is needed to access other calls on the service. The Association Register has a [`/parties`](https://dev.ishare.eu/ishare-satellite-role/single-party) endpoint which is used to retrieve information about specific participants. It also has a [`/trusted_list`](https://dev.ishare.eu/ishare-satellite-role/trusted-list) which lists all Certificate Authorities that are trusted.
 The Authorization Register has a [`/delegation`](https://dev.ishare.eu/authorisation-registry-role/delegation-endpoint) endpoint which you can use to obtain a Delegation Evidence JWT.
 The Service Provider may have any number of API calls, which are accessible with authentication in the form of a Bearer Token, and authorization in the form of Delegation Evidence.

@@ -25,7 +25,7 @@ Before getting started with these recipes, we recommend that you install the fol
 
 All recipes make use of a number of constants and functions defined below. Some constants should be adapted by you, such as the location of your private key and certificate.
 
-```
+```js
 // requires
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
@@ -305,7 +305,7 @@ function checkToken(token, tokenList) {
 
 As Data Consumer, call the API of a Service Provider without being pre-authorized by an Authorization Registry. It is recommended to check the adherence status of the Service Provider first with the Association Register. The Service Provider may try to obtain authorization at a Authorization Register, or it may try to authorize you in an ad hoc way.
 
-```
+```js
 let party = lookupParty(SP_EORI, YOUR_CLIENT_EORI);
 checkAdherence(party);
 
@@ -330,7 +330,7 @@ response = await axios.post(spApiUrl, body, headersApi);
 
 As Data Consumer, call the API of a Service Provider while being pre-authorized by an Authorization Registry, which means having received a Delegation Evidence JWT. You'll need to look up the details of the Authorization Register (id and URL) in the Association Register.
 
-```
+```js
 let party = lookupParty(SP_EORI, YOUR_CLIENT_EORI);
 checkAdherence(party);
 const {arEori, tokenArUrl, delegationArUrl} = extractAuthRegisterFromParty(party);
@@ -374,7 +374,7 @@ response = await axios.post(spApiUrl, body, { headers: headersApi });
 
 As Service Provider, handle an authenticated call by a Data Consumer which does not include pre-authorization. The provider will need to perform authorization manually, or contact an Authorization Registry.
 
-```
+```js
 // After a user has made a http request for the token, extract the client assertion and call this function.
 // This function will either return a bearer authorization token that can be used once
 // within the configured expiration date, or throw an error.
@@ -477,7 +477,7 @@ async function callApi(token, request) {
 
 As Service Provider, handle an authenticated call by a Data Consumer which includes pre-authorization. The provider will need to check whether the pre-authorization is valid and compatible with the action.
 
-```
+```js
 // After a user has made a http request for the token, extract the client assertion and call this function.
 // This function will either return a bearer authorization token that can be used once
 // within the configured expiration date, or throw an error.
@@ -559,7 +559,7 @@ function callApi(token, delegationToken, request) {
 
 As Service Provider, handle an authenticated call by a Data Consumer which does not include pre-authorization. The provider must perform authorization manually.
 
-```
+```js
 // After a user has made a http request for the token, extract the client assertion and call this function.
 // This function will either return a bearer authorization token that can be used once
 // within the configured expiration date, or throw an error.
