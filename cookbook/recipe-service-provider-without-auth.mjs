@@ -54,8 +54,7 @@ async function token(clientAssertionJWT) {
 
   let partiesResponse = await axios.get(partiesUrlAssoc + '/' + clientId, { headers: headersParties, params: {} });
   let partyToken = partiesResponse.data['party_token'];
-  const decodedPayload = decodeJWT(partyToken);
-  let party = decodedPayload["payload"]["party_info"];
+  let party = decodeJWT(partyToken).payload.party_info;
   // check adherence of client
   checkAdherence(party["adherence"]);
 
