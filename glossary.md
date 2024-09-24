@@ -2,6 +2,7 @@
 title: Glossary
 category: 9. Glossary
 order: 1
+class: glossary
 ---
 
 Association Register

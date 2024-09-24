@@ -8,29 +8,29 @@ Within a Data Space, the Authorization Register manages and enforces access cont
 
 The Basic Data Infrastructure separates the roles of Service Provider and Authorization Register, but it's possible to implement a service-specific Authorization Register or to integrate the authorization mechanisms in the service (especially when adding BDI functionality to existing services).
 
-#### Core Functions of the Authorization Register
+## Core Functions of the Authorization Register
 
-##### Access Control Policy Management:
+### Access Control Policy Management:
 
 - Policy Definition: Allows administrators to define access control policies that specify who can access what data and under what conditions.
 - Policy Storage: Securely stores these policies to ensure they are enforced consistently across the Data Space.
 
-##### Authorization Decision Making:
+### Authorization Decision Making:
 
 - Request Evaluation: Evaluates access requests against the stored policies to determine whether to grant or deny access.
 - Contextual Analysis: Takes into account contextual information such as the time of request, location, and other relevant factors to make nuanced authorization decisions.
 
-##### Delegation of Rights:
+### Delegation of Rights:
 
 - Delegation Support: Allows data owners to delegate access rights to other participants. This delegation can be temporary or conditional, based on specific criteria.
 - Chaining of Permissions: Supports the chaining of permissions where rights can be delegated through multiple levels of participants.
 
-##### Interoperability and Standards:
+### Interoperability and Standards:
 
 - Standard Protocols: Uses standard protocols (e.g., OAuth, XACML) for authorization to ensure interoperability between different systems and services within the Data Space.
 - Integration Support: Facilitates integration with other components such as Association Registries, identity providers, and data services.
 
-#### Main API Call
+## Main API Call
 
 The main API call of the Authorization Register is [the `/delegation` call](https://dev.ishare.eu/authorisation-registry-role/delegation-endpoint). It is used to pass a delegation mask, or delegation request, to the AR, and to receive a Delegation Evidence, a JWT, in response. A Delegation Mask contains an issuer and a target, and a set of policies. Each policy contains (desired) rules (e.g., "Effect: permit"), and a target. The target contains a resource, an environment, and a list of actions (e.g., create, read, update, delete). Together, the policies represent the right to take specified actions on a specified set of resources.
 
