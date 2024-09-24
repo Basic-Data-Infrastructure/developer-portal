@@ -8,7 +8,9 @@ order: 1
 
 Before getting started with these recipes, we recommend that you install the following libraries, using this command:
 
-`npm install axios uuid jsonwebtoken node-forge`
+```sh
+npm install axios uuid jsonwebtoken node-forge
+```
 
 ## Table of Contents
 
