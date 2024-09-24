@@ -103,3 +103,12 @@ article {
     main { display: inherit; }
     nav { max-width: inherit; min-height: inherit; }
 }
+
+
+
+article.glossary h2 {
+    margin-top: 2.5em;
+    font-size: 1.25em;
+    font-weight: normal;
+    font-style: italic;
+}
