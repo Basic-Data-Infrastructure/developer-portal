@@ -42,6 +42,17 @@ git checkout -b feature-branch
 
 - Make Your Changes: Implement your changes locally. Please ensure your code follows the project's coding standards and includes tests where appropriate.
 
+- Test your changes by generating this website locally.
+
+  This website is build using [Jekyll](https://jekyllrb.com/).  To use Jekyll, install a recent version of [Ruby](https://www.ruby-lang.org/) and the following Ruby Gems:
+
+  - jekyll
+  - jekyll-remote-theme
+  - jekyll-default-layout
+  - jekyll-seo-tag
+
+  Run `jekyll serve` and point a browser to   [http://localhost:4000](http://localhost:4000).
+
 - Commit Your Changes: After making your changes, commit them to your branch with a descriptive commit message:
 
 ```sh
