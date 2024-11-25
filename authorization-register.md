@@ -4,6 +4,8 @@ category: 4. Components
 order: 3
 ---
 
+The [Authorization Register](https://bdi.gitbook.io/public/reference-architecture/trust-kit/authorisation-oauth-2.0-ar-dm-+-xacml-policies) is defined as a building block of the BDI Architecture Trust Kit.
+
 Within a Data Space, the Authorization Register manages and enforces access control policies. Its core functions revolve around ensuring that data access is granted based on predefined rules and that only authorized participants can access specific data or services.
 
 The Basic Data Infrastructure separates the roles of Service Provider and Authorization Register, but it's possible to implement a service-specific Authorization Register or to integrate the authorization mechanisms in the service (especially when adding BDI functionality to existing services).
