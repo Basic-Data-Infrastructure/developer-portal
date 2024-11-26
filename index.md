@@ -6,7 +6,11 @@ order: 1
 
 ## Overview of BDI
 
-BDI is an architecture that enables services to allow unknown clients to access their APIs if these clients are known to, authenticated by, and authorized by other BDI services. This allows networks of organizations, such as those in the logistics sector, to share data securely and efficiently without the need for an overarching organization to coordinate it all. BDI allows loose coupling of services, using standards where possible, but without requiring them. Even within this loose structure, BDI allows for secure and efficient access to APIs.
+The [Basic Data Infastructure (BDI)](https://bdinetwork.org/) is a framework that enables services to allow unknown clients to access their APIs if these clients are known to, authenticated by, and authorized by other BDI services. This allows networks of organizations, such as those in the logistics sector, to share data securely and efficiently without the need for an overarching organization to coordinate it all. BDI allows loose coupling of services, using standards where possible, but without requiring them. Even within this loose structure, BDI allows for secure and efficient access to APIs.
+
+## Architecture reference
+
+The full width of the Basic Data Infrastructure framework is described in [the BDI architecure reference site](https://bdi.gitbook.io/public). This developer portal focuses on the currently available components and API specifications.
 
 ## Key Concepts and Components
 

@@ -8,13 +8,11 @@ order: 1
 
 Several components are available for BDI implementations.
 
-### [FIWARE iSHARE Satellite](https://github.com/FIWARE/ishare-satellite)
+### [BDI Stack](https://github.com/Basic-Data-Infrastructure/bdi-stack)
 
-A simple implementation of an iSHARE satellite trust anchor / BDI Association Register.
+The BDI Stack contains development and demo tooling and includes docker containers for running an [Assocation Register](assocation-register.md) and [Authorization Register](authorization-register.md) locally.
 
-The FIWARE iSHARE Satellite is based on Python Flask using Gunicorn and runs completely stateless. It is configured with a static configuration file.
-
-_This implementation of the iSHARE Satellite is only meant for testing and demonstration purposes. It is not possible to change participants or trusted CAs in a running instance. It is not recommended to be used in production environments._
+## Third party components
 
 ### [Poort8 Dataspace Noodle Bar](https://github.com/POORT8/Poort8.Dataspace.NoodleBar)
 
@@ -46,3 +44,12 @@ _The Authorization Register code that is in this repository is not a 'production
 This is the iSHARE equivalent of a BDI Association Register.
 
 The iSHARE Satellite is an application that safeguards trust in a dataspace. It functions as a register of participants. Participants can call the Satellite API to verify each other. When you verify that a participant is registered in the Satellite, you know that this participant has signed which agreements and the participant is indeed a part of a dataspace, also on a "legal level".
+
+### [FIWARE iSHARE Satellite](https://github.com/FIWARE/ishare-satellite)
+
+A simple implementation of an iSHARE satellite trust anchor / BDI Association Register.
+
+The FIWARE iSHARE Satellite is based on Python Flask using Gunicorn and runs completely stateless. It is configured with a static configuration file.
+
+_This implementation of the iSHARE Satellite is only meant for testing and demonstration purposes. It is not possible to change participants or trusted CAs in a running instance. It is not recommended to be used in production environments._
+
