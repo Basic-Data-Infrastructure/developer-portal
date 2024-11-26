@@ -12,6 +12,11 @@ Several components are available for BDI implementations.
 
 The BDI Stack contains development and demo tooling and includes docker containers for running an [Association Register](association-register.md) and [Authorization Register](authorization-register.md) locally.
 
+### [Apache Pulsar Authorization Plugin](https://github.com/Topsector-Logistiek/Apache-Pulsar-Auth-Plugin)
+
+An [Apache Pulsar](https://pulsar.apache.org/) authorization plugin for use with other BDI components.  It implements authentication through an association register and authorization through an authorization register for topic access.
+
+
 ## Third party components
 
 ### [Poort8 Dataspace Noodle Bar](https://github.com/POORT8/Poort8.Dataspace.NoodleBar)
