@@ -10,7 +10,7 @@ Several components are available for BDI implementations.
 
 ### [BDI Stack](https://github.com/Basic-Data-Infrastructure/bdi-stack)
 
-The BDI Stack contains development and demo tooling and includes docker containers for running an [Assocation Register](assocation-register.md) and [Authorization Register](authorization-register.md) locally.
+The BDI Stack contains development and demo tooling and includes docker containers for running an [Association Register](association-register.md) and [Authorization Register](authorization-register.md) locally.
 
 ## Third party components
 
